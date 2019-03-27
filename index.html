@@ -1,0 +1,158 @@
+<!-- IMAD TAGHZOUT -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title> Jeu Balle </title>
+    <style>
+				canvas { border: 1px solid rgb(236, 236, 236); background: #ffffff;; }
+        #nb { font-size: 50px; font-weight: bold; color: goldenrod; }
+        #nb span { font-size: 28px; font-weight: bold; color: #000000; }
+        .container { 
+						background: rgb(236, 236, 236);font-size: 13px; font-weight: bold; color: #000000;
+						width: 300px;
+						margin: 0 auto;
+						padding: 20px;
+						text-align: center;
+				 }
+				 #btn { 
+					 	display: block;
+						margin: 20px auto;
+						padding: 10px;
+						font-weight: bold;
+						font-size: 15px;
+				 }
+				 #perdu { 
+						color: red;	font-size: 19px;margin-bottom: 20px;
+				 }
+    </style>
+    <!---->
+		<script src="jquery-3.3.1.js"></script>
+</head>
+<body>
+	
+	<div class="container">
+			<div id="nb"> <span> Score : </span> 0 </div>
+			<div id="perdu"> ... </div>
+			<canvas id="canvas" width="300" height="300"></canvas><br>
+			<button id="btn" onclick="play()"> Play </button>
+	</div>
+	
+  <script>
+			
+			function play(){
+					location.reload();
+			}
+
+			const canvas = document.querySelector('canvas');
+			var ctx = canvas.getContext('2d');
+			ctx.beginPath();
+			ctx.arc(75, 75, 10, 0, Math.PI*2, true); // Centre (75, 75), rayon 10, de 0 à 2π
+			ctx.closePath();
+			ctx.fill();
+			
+			var x = 150;
+			var y = 150;
+			var dx = 2;
+			var dy = 4;
+			var WIDTH;
+			var HEIGHT;
+			var ctx;
+			var paddlex;
+			var paddleh;
+			var paddlew;
+			var rightDown = false;
+			var leftDown = false;
+			var nb = 0, perdu = 0;
+
+			function init() {
+				ctx = canvas.getContext('2d');
+				WIDTH = canvas.width;
+				HEIGHT = canvas.height;
+				return setInterval(draw, 10);
+			}
+
+			function circle(x,y,r) {
+				ctx.beginPath();
+				ctx.arc(x, y, r, 0, Math.PI*2, true);
+				ctx.closePath();
+				ctx.fill();
+			}
+
+			function rect(x,y,w,h) {
+				ctx.beginPath();
+				ctx.rect(x,y,w,h);
+				ctx.closePath();
+				ctx.fill();
+			}
+
+			function clear() {
+				ctx.clearRect(0, 0, WIDTH, HEIGHT);
+			}
+
+			function onKeyDown(evt) {
+				if (perdu == 1){
+					nb = 0;
+					document.getElementById('nb').innerHTML = "<span>Score : </span>" + nb;
+					document.getElementById('perdu').innerHTML = "...";
+					perdu = 0;
+				}
+				if (evt.keyCode == 39) rightDown = true; 
+				else if (evt.keyCode == 37) leftDown = true;
+			}
+
+			function onKeyUp(evt) {
+				if (perdu == 1){
+					nb = 0;
+					document.getElementById('nb').innerHTML = "<span>Score : </span>" + nb;
+					document.getElementById('perdu').innerHTML = "...";
+					perdu = 0;
+				}
+				if (evt.keyCode == 39) rightDown = false;
+				else if (evt.keyCode == 37) leftDown = false; 
+			}
+			
+			$(document).keydown(onKeyDown); 
+			$(document).keyup(onKeyUp);  
+				
+			function init_paddle() {
+				paddlex = WIDTH / 2;
+				paddleh = 10;
+				paddlew = 75;
+			}
+
+			function draw() {
+				clear();
+				circle(x, y, 10);
+				if (rightDown) paddlex += 5;
+				else if (leftDown) paddlex -= 5;
+				rect(paddlex, HEIGHT-paddleh, paddlew, paddleh); 
+				if (x + dx > WIDTH || x + dx < 0){
+					dx = -dx;
+				}
+				if (y + dy < 0){
+					dy = -dy;
+				}
+				else if (y + dy > HEIGHT) {
+						if (x > paddlex && x < paddlex + paddlew){
+							dy = -dy;
+							nb++;
+							document.getElementById('nb').innerHTML = "<span>Score : </span>" + nb;
+						}else{
+								// Perdu
+								perdu = 1;
+								document.getElementById('perdu').innerHTML = "Perdu !";
+								clearInterval(intervalId);
+						}
+				}
+				x += dx;
+				y += dy;
+			}
+
+			init();
+			init_paddle();
+
+  </script>
+  
+</body>
+</html>
